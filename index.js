@@ -1,18 +1,21 @@
+import dotenv from "dotenv";
 import { exec } from "child_process";
 import cors from "cors";
-import dotenv from "dotenv";
 import voice from "elevenlabs-node";
 import express from "express";
 import { promises as fs } from "fs";
 import OpenAI from "openai";
+import path from "path";
 dotenv.config();
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "-", // Your OpenAI API key here, I used "-" to avoid errors when the key is not set but you should not do that
+  apiKey: process.env.OPENAI_API_KEY, // Your OpenAI API key here, I used "-" to avoid errors when the key is not set but you should not do that
 });
 
 const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY;
-const voiceID = "kgG7dCoKCfLehAPWkJOE";
+const voiceID = process.env.ELEVEN_LABS_VOICE_ID;
+
+console.log(elevenLabsApiKey);
 
 const app = express();
 app.use(express.json());
@@ -30,7 +33,12 @@ app.get("/voices", async (req, res) => {
 const execCommand = (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
-      if (error) reject(error);
+      if (error) {
+        console.error(`Error executing command: ${command}`);
+        console.error(`Error: ${error.message}`);
+        console.error(`stderr: ${stderr}`);
+        reject(error);
+      }
       resolve(stdout);
     });
   });
@@ -44,9 +52,12 @@ const lipSyncMessage = async (message) => {
     // -y to overwrite the file
   );
   console.log(`Conversion done in ${new Date().getTime() - time}ms`);
-  await execCommand(
-    `./bin/rhubarb -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`
-  );
+
+  const rhubarbPath = path.join(process.cwd(), "bin/rhubarb", "rhubarb.exe");
+  const command = `"${rhubarbPath}" -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`;
+  console.log(`Executing command: ${command}`);
+  await execCommand(command);
+
   // -r phonetic is faster but less accurate
   console.log(`Lip sync done in ${new Date().getTime() - time}ms`);
 };
@@ -129,7 +140,12 @@ app.post("/chat", async (req, res) => {
     // generate audio file
     const fileName = `audios/message_${i}.mp3`; // The name of your audio file
     const textInput = message.text; // The text you wish to convert to speech
-    await voice.textToSpeech(elevenLabsApiKey, voiceID, fileName, textInput);
+    try {
+      await voice.textToSpeech(elevenLabsApiKey, voiceID, fileName, textInput);
+    } catch (error) {
+      console.error("Error calling Eleven Labs API:", error);
+      return res.status(500).json({ error: "Failed to generate audio" });
+    }
     // generate lipsync
     await lipSyncMessage(i);
     message.audio = await audioFileToBase64(fileName);
