@@ -6,7 +6,13 @@ import express from "express";
 import { promises as fs } from "fs";
 import OpenAI from "openai";
 import path from "path";
+
 dotenv.config();
+
+const corsOptions = {
+  origin: "http://localhost:5174",
+  methods: "GET,POST",
+};
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Your OpenAI API key here, I used "-" to avoid errors when the key is not set but you should not do that
@@ -19,7 +25,7 @@ console.log(elevenLabsApiKey);
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 const port = 3000;
 
 app.get("/", (req, res) => {
