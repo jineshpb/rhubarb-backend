@@ -50,9 +50,23 @@ const execCommand = (command) => {
   });
 };
 
+const checkFfmpeg = () => {
+  return new Promise((resolve, reject) => {
+    exec("ffmpeg -version", (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error("ffmpeg is not installed or not available in PATH"));
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
 const lipSyncMessage = async (message) => {
   const time = new Date().getTime();
   console.log(`Starting conversion for message ${message}`);
+  await checkFfmpeg();
+
   await execCommand(
     `ffmpeg -y -i audios/message_${message}.mp3 audios/message_${message}.wav`
     // -y to overwrite the file
