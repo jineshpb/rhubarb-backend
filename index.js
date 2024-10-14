@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config();
 import { exec } from "child_process";
 import cors from "cors";
 import voice from "elevenlabs-node";
@@ -7,11 +8,33 @@ import { promises as fs } from "fs";
 import OpenAI from "openai";
 import path from "path";
 
-dotenv.config();
+console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
+console.log("ELEVEN_LABS_API_KEY:", process.env.ELEVEN_LABS_API_KEY);
+console.log("ELEVEN_LABS_VOICE_ID:", process.env.ELEVEN_LABS_VOICE_ID);
+
+// Rest of your imports and code...
 
 const corsOptions = {
-  origin: "http://localhost:5174",
-  methods: "GET,POST",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // List of allowed origins
+    const allowedOrigins = [
+      "http://localhost:5174",
+      "https://your-frontend-domain.com", // Replace with your actual frontend domain
+    ];
+
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 const openai = new OpenAI({
