@@ -1,0 +1,55 @@
+{
+  "black_betty": {
+    "general": {
+      "description": "Black Betty is a Mad Max-inspired GM Ambassador built for survival in the wastelands.",
+      "story": "Born in the back alleys of Mumbai, reborn as a wasteland raider, she’s seen more dust than tarmac."
+    },
+    "features": {
+      "front_bumper": {
+        "description": "A rusted steel frame reinforced with salvaged rebar, designed to smash through debris.",
+        "materials": "Reinforced steel, welded scrap parts."
+      },
+      "roof_rack": {
+        "description": "Heavy-duty cargo rack loaded with survival gear and spotlights.",
+        "lore": "Built for carrying supplies across desert landscapes."
+      },
+      "tires": {
+        "description": "Thick, rugged off-road tires for any terrain.",
+        "brand": "Salvaged from an abandoned truck convoy."
+      },
+      "engine": {
+        "name": "Toyota 1UZ-FE V8",
+        "displacement": "4.0L",
+        "cylinders": 8,
+        "fuel": "Petrol",
+        "power_output": "260-300 hp (stock), potential for more with mods",
+        "torque": "353 Nm (260 lb-ft)",
+        "origin": "Salvaged from a wrecked Lexus LS400, repurposed for survival.",
+        "lore": "Once a symbol of luxury in the streets of Mumbai, the 1UZ-FE V8 now roars in Black Betty’s chest, turning a relic into a road warrior. It’s the kind of engine that screams power in the wastelands, letting you outrun raiders and tear through the desert with ease."
+      },
+      "exhaust": {
+        "description": "Custom-fabricated side-exit exhaust pipes with no mufflers, designed for maximum flow and an earth-shaking roar.",
+        "materials": "Salvaged steel tubing, welded joints, heat-resistant paint.",
+        "lore": "The wastelands don’t care about noise regulations. Betty’s exhaust is a battle cry—raw, untamed, and built to intimidate. You’ll hear her coming long before you see the dust cloud she leaves behind.",
+        "visual": "Twin side pipes emerging just ahead of the rear wheels, covered in soot and battle scars.",
+        "performance": "Minimal backpressure for the 1UZ-FE V8, optimized for power over subtlety."
+      },
+      "suspension": {
+        "description": "A modified suspension system with heavy-duty shocks and springs, designed for off-road durability.",
+        "materials": "Custom-built shock absorbers, heavy-duty springs, and reinforced chassis."
+      },
+      "brakes": {
+        "description": "Modified disc brakes with upgraded pads and rotors, providing reliable stopping power.",
+        "materials": "Custom-built calipers, high-performance pads, and heavy-duty rotors."
+      },
+      "interior": {
+        "description": "A modified interior with a focus on survival and comfort.",
+        "materials": "Custom-built seats, reinforced floor, and storage compartments."
+      },
+      "exterior": {
+        "description": "A modified exterior with a focus on survival and style.",
+        "materials": "Custom-built body panels, reinforced chassis, and survival gear storage."
+      }
+    }
+  }
+}
