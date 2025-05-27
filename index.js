@@ -94,22 +94,22 @@ const checkFfmpeg = () => {
 
 const lipSyncMessage = async (message) => {
   const time = new Date().getTime();
-  console.log(`Starting conversion for message ${message}`);
+  console.log(`[${message}] [START] MP3 to WAV conversion for message`);
   await checkFfmpeg();
-
   await execCommand(
     `ffmpeg -y -i audios/message_${message}.mp3 audios/message_${message}.wav`
     // -y to overwrite the file
   );
-  console.log(`Conversion done in ${new Date().getTime() - time}ms`);
-
+  console.log(
+    `[${message}] [DONE] Conversion done in ${new Date().getTime() - time}ms`
+  );
   const rhubarbPath = path.join(process.cwd(), "bin/rhubarb/rhubarb");
   const command = `"${rhubarbPath}" -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`;
-  console.log(`Executing command: ${command}`);
+  console.log(`[${message}] [START] Executing command: ${command}`);
   await execCommand(command);
-
-  // -r phonetic is faster but less accurate
-  console.log(`Lip sync done in ${new Date().getTime() - time}ms`);
+  console.log(
+    `[${message}] [DONE] Lip sync done in ${new Date().getTime() - time}ms`
+  );
 };
 
 app.post("/chat", async (req, res) => {
@@ -216,19 +216,43 @@ app.post("/chat", async (req, res) => {
     // generate audio file
     const uniqueId = uuidv4();
     const fileName = `audios/message_${uniqueId}.mp3`;
-    const textInput = message.text; // The text you wish to convert to speech
+    const textInput = message.text;
+    console.log(
+      `[${uniqueId}] [START] Generating audio for message:`,
+      textInput
+    );
     try {
       await voice.textToSpeech(elevenLabsApiKey, voiceID, fileName, textInput);
+      console.log(`[${uniqueId}] [DONE] Audio file generated: ${fileName}`);
     } catch (error) {
-      console.error("Error calling Eleven Labs API:", error);
+      console.error(`[${uniqueId}] [ERROR] Eleven Labs API:`, error);
       return res.status(500).json({ error: "Failed to generate audio" });
     }
-    // generate lipsync
-    await lipSyncMessage(i);
-    message.audio = await audioFileToBase64(fileName);
-    message.lipsync = await readJsonTranscript(
-      `audios/message_${uniqueId}.json`
-    );
+    console.log(`[${uniqueId}] [START] Lip sync for file: ${fileName}`);
+    try {
+      await lipSyncMessage(i);
+      console.log(
+        `[${uniqueId}] [DONE] Lip sync for file: audios/message_${i}.json`
+      );
+    } catch (error) {
+      console.error(`[${uniqueId}] [ERROR] Lip sync:`, error);
+      return res.status(500).json({ error: "Failed to generate lipsync" });
+    }
+    try {
+      message.audio = await audioFileToBase64(fileName);
+      message.lipsync = await readJsonTranscript(`audios/message_${i}.json`);
+      console.log(
+        `[${uniqueId}] [DONE] Audio and lipsync data loaded for response.`
+      );
+    } catch (error) {
+      console.error(
+        `[${uniqueId}] [ERROR] Reading audio or lipsync file:`,
+        error
+      );
+      return res
+        .status(500)
+        .json({ error: "Failed to read audio or lipsync file" });
+    }
   }
 
   res.send({ messages });
